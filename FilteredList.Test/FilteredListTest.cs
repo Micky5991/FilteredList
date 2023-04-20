@@ -1,7 +1,7 @@
 namespace FilteredList.Test;
 
 [TestClass]
-public class UnitTest1
+public class FilteredListTest
 {
     [TestMethod]
     public void TestMethod1()

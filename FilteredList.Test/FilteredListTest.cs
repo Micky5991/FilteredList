@@ -1,4 +1,4 @@
-namespace FilteredList.Test;
+namespace Micky5991.FilteredList.Test;
 
 [TestClass]
 public class FilteredListTest

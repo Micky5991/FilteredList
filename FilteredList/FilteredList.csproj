@@ -1,16 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <AssemblyName>Micky5991.FilteredList</AssemblyName>
-    <RootNamespace>Micky5991.FilteredList</RootNamespace>
-    <LangVersion>11</LangVersion>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>Micky5991.FilteredList</AssemblyName>
+        <RootNamespace>Micky5991.FilteredList</RootNamespace>
+        <LangVersion>11</LangVersion>
+        <Authors>Micky5991</Authors>
+        <Copyright>2023 Micky5991</Copyright>
+        <PackageProjectUrl>https://github.com/Micky5991/FilteredList</PackageProjectUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/Micky5991/FilteredList</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>list, collection, filtered</PackageTags>
+        <Description>🎣 FilteredList implementation for .NET</Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Diagnostics" Version="8.1.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="CommunityToolkit.Diagnostics" Version="8.1.0"/>
+    </ItemGroup>
 
+    <ItemGroup>
+        <None Include="../README.md" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+    
 </Project>

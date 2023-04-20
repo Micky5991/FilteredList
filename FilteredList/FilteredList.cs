@@ -7,6 +7,7 @@ using CommunityToolkit.Diagnostics;
 namespace Micky5991.FilteredList;
 
 public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyCollectionChanged, INotifyPropertyChanged
+    where TItem : TSource
 {
     public ObservableCollection<TSource> Source { get; }
     public Predicate<TSource> Filter { get; }
@@ -109,6 +110,7 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
     }
 
     public FilteredList<TNew, TSource> CreateSubSet<TNew>(Predicate<TNew> filter)
+        where TNew : TSource
     {
         Guard.IsNotNull(filter);
 

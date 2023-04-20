@@ -10,10 +10,10 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
     where TItem : TSource
 {
     public ObservableCollection<TSource> Source { get; }
-    public Predicate<TSource> Filter { get; }
     public int Count => this.items.Count;
 
     private readonly HashSet<TItem> items;
+    public Predicate<TSource> Filter { get; }
 
     public FilteredList(ObservableCollection<TSource> source, Predicate<TSource> filter)
     {
@@ -25,15 +25,14 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
         this.Source = source;
         this.Filter = filter;
 
-        foreach (var item in source)
-        {
-            if (item is TItem compatibleItem && this.Filter(item))
-            {
-                this.items.Add(compatibleItem);
-            }
-        }
+        this.Reset();
 
         this.Source.CollectionChanged += this.OnSourceChanged;
+    }
+
+    public FilteredList(ObservableCollection<TSource> source, Predicate<TItem> filter)
+        : this(source, (TSource x) => x is TItem tItem && filter(tItem))
+    {
     }
 
     public event NotifyCollectionChangedEventHandler? CollectionChanged;
@@ -47,7 +46,7 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
             case NotifyCollectionChangedAction.Add:
                 foreach (var item in e.NewItems.Cast<TSource>())
                 {
-                    if (item is TItem compatibleItem && this.Filter(item))
+                    if (item is TItem compatibleItem && this.Filter(compatibleItem))
                     {
                         this.items.Add(compatibleItem);
                     }
@@ -74,7 +73,7 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
 
                 foreach (var (newItem, oldItem) in changes)
                 {
-                    if (newItem is not TItem compatibleNewItem || oldItem is not TItem compatibleOldItem || this.Filter(newItem) == false)
+                    if (newItem is not TItem compatibleNewItem || oldItem is not TItem compatibleOldItem || this.Filter(compatibleNewItem) == false)
                     {
                         continue;
                     }
@@ -91,15 +90,7 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
                 break;
 
             case NotifyCollectionChangedAction.Reset:
-                this.items.Clear();
-
-                foreach (var item in this.Source)
-                {
-                    if (item is TItem compatibleItem && this.Filter(item))
-                    {
-                        this.items.Add(compatibleItem);
-                    }
-                }
+                this.Reset();
 
                 break;
 
@@ -109,12 +100,25 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
         }
     }
 
+    private void Reset()
+    {
+        this.items.Clear();
+
+        foreach (var item in this.Source)
+        {
+            if (item is TItem compatibleItem && this.Filter(compatibleItem))
+            {
+                this.items.Add(compatibleItem);
+            }
+        }
+    }
+
     public FilteredList<TNew, TSource> CreateSubSet<TNew>(Predicate<TNew> filter)
-        where TNew : TSource
+        where TNew : TItem, TSource
     {
         Guard.IsNotNull(filter);
 
-        return new FilteredList<TNew, TSource>(this.Source,x => x is TNew newX && this.Filter(x) && filter(newX));
+        return new FilteredList<TNew, TSource>(this.Source,(TSource x) => x is TNew newX && this.Filter(x) && filter(newX));
     }
 
     public IEnumerator<TItem> GetEnumerator()
@@ -125,13 +129,5 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
     IEnumerator IEnumerable.GetEnumerator()
     {
         return this.GetEnumerator();
-    }
-}
-
-public sealed class FilteredList<T> : FilteredList<T, T>
-{
-    public FilteredList(ObservableCollection<T> source, Predicate<T> filter)
-        : base(source, filter)
-    {
     }
 }

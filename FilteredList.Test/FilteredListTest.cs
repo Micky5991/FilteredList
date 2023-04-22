@@ -239,4 +239,37 @@ public class FilteredListOneTests
 
         list.Should().HaveCount(3).And.NotContain(1);
     }
+
+    [TestMethod]
+    public void DuplicateValuesShouldAllExist()
+    {
+        var source = new ObservableCollection<int>(new []{ 1, 1, 1, });
+
+        var list = new FilteredList<int>(source, _ => true);
+
+        list.Should().HaveCount(3).And.Contain(x => x == 1);
+    }
+
+    [TestMethod]
+    public void RemovingDuplicateValueShouldKeepOtherValues()
+    {
+        var source = new ObservableCollection<int>(new []{ 1, 1, 1, });
+
+        var list = new FilteredList<int>(source, _ => true);
+        source.Remove(1);
+
+        list.Should().HaveCount(2).And.Contain(x => x == 1);
+    }
+
+    [TestMethod]
+    public void RemovingTwoDuplicateValueShouldKeepOtherValues()
+    {
+        var source = new ObservableCollection<int>(new []{ 1, 1, 1, });
+
+        var list = new FilteredList<int>(source, _ => true);
+        source.Remove(1);
+        source.Remove(1);
+
+        list.Should().HaveCount(1).And.Contain(x => x == 1);
+    }
 }

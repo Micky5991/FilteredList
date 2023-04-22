@@ -9,21 +9,21 @@ namespace Micky5991.FilteredList;
 public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyCollectionChanged, INotifyPropertyChanged
     where TItem : TSource
 {
+
     public ObservableCollection<TSource> Source { get; }
     public int Count => this.items.Count;
 
     private readonly HashSet<int> items;
-    public Predicate<TSource> Filter { get; }
+    private readonly Predicate<TSource>? filter;
 
-    public FilteredList(ObservableCollection<TSource> source, Predicate<TSource> filter)
+    public FilteredList(ObservableCollection<TSource> source, Predicate<TSource>? filter = null)
     {
         Guard.IsNotNull(source);
-        Guard.IsNotNull(filter);
 
         this.items = new HashSet<int>();
+        this.filter = filter;
 
         this.Source = source;
-        this.Filter = filter;
 
         this.Reset();
 
@@ -80,7 +80,7 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
     {
         var item = this.Source[index];
 
-        if (item is not TItem compatibleItem || this.Filter(compatibleItem) == false)
+        if (item is not TItem compatibleItem || this.CheckFilter(compatibleItem) == false)
         {
             return;
         }
@@ -125,7 +125,7 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
 
     private void OnReplace(int index)
     {
-        if (this.Source[index] is not TItem compatibleItem || this.Filter(compatibleItem) == false)
+        if (this.Source[index] is not TItem compatibleItem || this.CheckFilter(compatibleItem) == false)
         {
             this.items.Remove(index);
         }
@@ -139,26 +139,44 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
         {
             var item = this.Source[i];
 
-            if (item is TItem compatibleItem && this.Filter(compatibleItem))
+            if (item is TItem compatibleItem && this.CheckFilter(compatibleItem))
             {
                 this.items.Add(i);
             }
         }
     }
 
-    public FilteredList<TNew, TSource> CreateSubSet<TNew>(Predicate<TNew> filter)
-        where TNew : TItem, TSource
+    public bool CheckFilter(TSource item)
     {
-        Guard.IsNotNull(filter);
+        if (this.filter == null)
+        {
+            return true;
+        }
 
-        return new FilteredList<TNew, TSource>(this.Source,x => x is TNew newX && this.Filter(x) && filter(newX));
+        return this.filter(item);
     }
 
-    public FilteredList<TItem, TSource> CreateSubSet(Predicate<TItem> filter)
+    public FilteredList<TNew, TSource> CreateSubSet<TNew>(Predicate<TNew>? subFilter = null)
+        where TNew : TItem, TSource
     {
-        Guard.IsNotNull(filter);
+        Predicate<TSource> typeFilter = x => x is TNew && this.CheckFilter(x);
+        if (subFilter != null)
+        {
+            typeFilter = x => x is TNew newX && this.CheckFilter(x) && subFilter(newX);
+        }
 
-        return new FilteredList<TItem, TSource>(this.Source,x => x is TItem newX && this.Filter(x) && filter(newX));
+        return new FilteredList<TNew, TSource>(this.Source, typeFilter);
+    }
+
+    public FilteredList<TItem, TSource> CreateSubSet(Predicate<TItem>? subFilter = null)
+    {
+        Predicate<TSource> typeFilter = x => x is TItem && this.CheckFilter(x);
+        if (subFilter != null)
+        {
+            typeFilter = x => x is TItem newX && this.CheckFilter(x) && subFilter(newX);
+        }
+
+        return new FilteredList<TItem, TSource>(this.Source, typeFilter);
     }
 
     public IEnumerator<TItem> GetEnumerator()

@@ -30,11 +30,6 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
         this.Source.CollectionChanged += this.OnSourceChanged;
     }
 
-    public FilteredList(ObservableCollection<TSource> source, Predicate<TItem> filter)
-        : this(source, (TSource x) => x is TItem tItem && filter(tItem))
-    {
-    }
-
     public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -73,13 +68,18 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
 
                 foreach (var (newItem, oldItem) in changes)
                 {
-                    if (newItem is not TItem compatibleNewItem || oldItem is not TItem compatibleOldItem || this.Filter(compatibleNewItem) == false)
+                    if (oldItem is not TItem compatibleOldItem)
                     {
                         continue;
                     }
 
                     var removed = this.items.Remove(compatibleOldItem);
                     if (removed == false)
+                    {
+                        continue;
+                    }
+
+                    if (newItem is not TItem compatibleNewItem || this.Filter(compatibleNewItem) == false)
                     {
                         continue;
                     }
@@ -92,10 +92,6 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
             case NotifyCollectionChangedAction.Reset:
                 this.Reset();
 
-                break;
-
-            default:
-                // empty
                 break;
         }
     }
@@ -118,7 +114,14 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
     {
         Guard.IsNotNull(filter);
 
-        return new FilteredList<TNew, TSource>(this.Source,(TSource x) => x is TNew newX && this.Filter(x) && filter(newX));
+        return new FilteredList<TNew, TSource>(this.Source,x => x is TNew newX && this.Filter(x) && filter(newX));
+    }
+
+    public FilteredList<TItem, TSource> CreateSubSet(Predicate<TItem> filter)
+    {
+        Guard.IsNotNull(filter);
+
+        return new FilteredList<TItem, TSource>(this.Source,x => x is TItem newX && this.Filter(x) && filter(newX));
     }
 
     public IEnumerator<TItem> GetEnumerator()

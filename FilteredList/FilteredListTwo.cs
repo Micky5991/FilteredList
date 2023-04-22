@@ -39,7 +39,7 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
         switch (e.Action)
         {
             case NotifyCollectionChangedAction.Add:
-                foreach (var item in e.NewItems.Cast<TSource>())
+                foreach (var item in e.NewItems)
                 {
                     if (item is TItem compatibleItem && this.Filter(compatibleItem))
                     {
@@ -50,7 +50,7 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
                 break;
 
             case NotifyCollectionChangedAction.Remove:
-                foreach (var item in e.OldItems.Cast<TSource>())
+                foreach (var item in e.OldItems)
                 {
                     if (item is not TItem compatibleItem)
                     {

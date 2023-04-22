@@ -12,7 +12,7 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
     public ObservableCollection<TSource> Source { get; }
     public int Count => this.items.Count;
 
-    private readonly HashSet<TItem> items;
+    private readonly HashSet<int> items;
     public Predicate<TSource> Filter { get; }
 
     public FilteredList(ObservableCollection<TSource> source, Predicate<TSource> filter)
@@ -20,7 +20,7 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
         Guard.IsNotNull(source);
         Guard.IsNotNull(filter);
 
-        this.items = new HashSet<TItem>();
+        this.items = new HashSet<int>();
 
         this.Source = source;
         this.Filter = filter;
@@ -39,53 +39,22 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
         switch (e.Action)
         {
             case NotifyCollectionChangedAction.Add:
-                foreach (var item in e.NewItems)
-                {
-                    if (item is TItem compatibleItem && this.Filter(compatibleItem))
-                    {
-                        this.items.Add(compatibleItem);
-                    }
-                }
+                this.OnAdd(e.NewStartingIndex);
 
                 break;
 
             case NotifyCollectionChangedAction.Remove:
-                foreach (var item in e.OldItems)
-                {
-                    if (item is not TItem compatibleItem)
-                    {
-                        continue;
-                    }
-
-                    this.items.Remove(compatibleItem);
-                }
+                this.OnRemove(e.OldStartingIndex);
 
                 break;
 
             case NotifyCollectionChangedAction.Replace:
-                var changes = e.NewItems.Cast<TSource>()
-                             .Zip(e.OldItems.Cast<TSource>(), (n, o) => (NewItem: n, OldItem: o));
+                this.OnReplace(e.NewStartingIndex);
 
-                foreach (var (newItem, oldItem) in changes)
-                {
-                    if (oldItem is not TItem compatibleOldItem)
-                    {
-                        continue;
-                    }
+                break;
 
-                    var removed = this.items.Remove(compatibleOldItem);
-                    if (removed == false)
-                    {
-                        continue;
-                    }
-
-                    if (newItem is not TItem compatibleNewItem || this.Filter(compatibleNewItem) == false)
-                    {
-                        continue;
-                    }
-
-                    this.items.Add(compatibleNewItem);
-                }
+            case NotifyCollectionChangedAction.Move:
+                this.OnMove(e.OldStartingIndex, e.NewStartingIndex);
 
                 break;
 
@@ -96,15 +65,83 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
         }
     }
 
+    private void OnMove(int oldIndex, int newIndex)
+    {
+        if (oldIndex == newIndex)
+        {
+            return;
+        }
+
+        this.OnRemove(oldIndex);
+        this.OnInsert(newIndex);
+    }
+
+    private void OnAdd(int index)
+    {
+        var item = this.Source[index];
+
+        if (item is not TItem compatibleItem || this.Filter(compatibleItem) == false)
+        {
+            return;
+        }
+
+        this.OnInsert(index);
+    }
+
+    private void OnRemove(int index)
+    {
+        this.items.Remove(index);
+
+        foreach (var oldValue in this.items.ToArray())
+        {
+            if (oldValue > index)
+            {
+                this.items.Remove(oldValue);
+                this.items.Add(oldValue - 1);
+            }
+        }
+    }
+
+    private void OnInsert(int index)
+    {
+        var toUpdate = new List<int>();
+
+        foreach (var oldValue in this.items.ToArray())
+        {
+            if (oldValue >= index)
+            {
+                this.items.Remove(oldValue);
+                toUpdate.Add(oldValue + 1);
+            }
+        }
+
+        foreach (var newValue in toUpdate)
+        {
+            this.items.Add(newValue);
+        }
+
+        this.items.Add(index);
+    }
+
+    private void OnReplace(int index)
+    {
+        if (this.Source[index] is not TItem compatibleItem || this.Filter(compatibleItem) == false)
+        {
+            this.items.Remove(index);
+        }
+    }
+
     private void Reset()
     {
         this.items.Clear();
 
-        foreach (var item in this.Source)
+        for (var i = 0; i < this.Source.Count; i++)
         {
+            var item = this.Source[i];
+
             if (item is TItem compatibleItem && this.Filter(compatibleItem))
             {
-                this.items.Add(compatibleItem);
+                this.items.Add(i);
             }
         }
     }
@@ -126,7 +163,10 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
 
     public IEnumerator<TItem> GetEnumerator()
     {
-        return this.items.GetEnumerator();
+        foreach (var index in this.items)
+        {
+            yield return (TItem)this.Source[index]!;
+        }
     }
 
     IEnumerator IEnumerable.GetEnumerator()

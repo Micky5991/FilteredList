@@ -8,6 +8,12 @@ namespace Micky5991.FilteredList.Test;
 public class FilteredListOneTests
 {
     [TestMethod]
+    public void ListOneImplementsListTwo()
+    {
+        typeof(FilteredList<int>).Should().BeDerivedFrom<FilteredList<int, int>>();
+    }
+
+    [TestMethod]
     public void ListShouldOnlyContainMatchinItemsInt()
     {
         var source = new ObservableCollection<int>(Enumerable.Range(1, 10));
@@ -35,132 +41,6 @@ public class FilteredListOneTests
             .And.HaveCount(2)
             .And.OnlyHaveUniqueItems()
             .And.AllSatisfy(x => x.Should().BeAssignableTo<IFurniture>());
-    }
-
-    [TestMethod]
-    public void ListShouldOnlyContainMatchinItems()
-    {
-        var source = new ObservableCollection<int>(Enumerable.Range(1, 10));
-        var list = new FilteredList<int>(source, x => x > 5);
-
-        var subset = list.CreateSubSet(x => x < 7);
-
-        subset.Should().OnlyContain(x => x > 5 && x < 7);
-    }
-
-    [TestMethod]
-    public void CreateSubsetShouldCheckSpecificTypes()
-    {
-        var source = new ObservableCollection<IFurniture>
-        {
-            new Chair(5),
-            new Chair(10),
-            new Table(5),
-            new Table(10),
-        };
-
-        var list = new FilteredList<IFurniture>(source, x => true);
-        var sublist = list.CreateSubSet((IChair _) => true);
-
-        sublist.Should()
-               .ContainInConsecutiveOrder(new Chair(5), new Chair(10))
-               .And.HaveCount(2)
-               .And.OnlyHaveUniqueItems()
-               .And.AllSatisfy(x => x.Should().BeAssignableTo<IChair>());
-    }
-
-    [TestMethod]
-    public void CreateSubsetShouldCheckSpecificTypesAndPreviousFilters()
-    {
-        var source = new ObservableCollection<IFurniture>
-        {
-            new Chair(5),
-            new Chair(10),
-            new Table(5),
-            new Table(10),
-        };
-
-        var list = new FilteredList<IFurniture>(source, x => x.Height > 5);
-        var sublist = list.CreateSubSet((IChair _) => true);
-
-        sublist.Should()
-               .ContainInConsecutiveOrder(new Chair(10))
-               .And.HaveCount(1)
-               .And.OnlyHaveUniqueItems()
-               .And.AllSatisfy(x => x.Should().BeAssignableTo<IChair>());
-    }
-
-    [TestMethod]
-    public void CreateSubsetShouldCheckSpecificTypesAndAllFilters()
-    {
-        var source = new ObservableCollection<IFurniture>
-        {
-            new Chair(5),
-            new Chair(7),
-            new Chair(10),
-            new Table(5),
-            new Table(7),
-            new Table(10),
-        };
-
-        var list = new FilteredList<IFurniture>(source, x => x.Height > 5);
-        var sublist = list.CreateSubSet((IChair x) => x.Height < 10);
-
-        sublist.Should()
-               .ContainInConsecutiveOrder(new Chair(7))
-               .And.HaveCount(1)
-               .And.OnlyHaveUniqueItems()
-               .And.AllSatisfy(x => x.Should().BeAssignableTo<IChair>());
-    }
-
-    [TestMethod]
-    public void CreateSubsetShouldRespectPreviousFilter()
-    {
-        var source = new ObservableCollection<int>(Enumerable.Range(1, 10));
-
-        var list = new FilteredList<int>(source, x => x > 5);
-        var sublist = list.CreateSubSet(_ => true);
-
-        sublist.Should()
-               .ContainInConsecutiveOrder(6, 7, 8, 9, 10)
-               .And.HaveCount(5)
-               .And.OnlyHaveUniqueItems();
-    }
-
-    [TestMethod]
-    public void CreateSubsetShouldRespectBothFilters()
-    {
-        var source = new ObservableCollection<int>(Enumerable.Range(1, 10));
-
-        var list = new FilteredList<int>(source, x => x > 5);
-        var sublist = list.CreateSubSet(x => x < 8);
-
-        sublist.Should()
-               .ContainInConsecutiveOrder(6, 7)
-               .And.HaveCount(2)
-               .And.OnlyHaveUniqueItems()
-               .And.OnlyContain(x => x > 5 && x < 8);
-    }
-
-    [TestMethod]
-    public void CreateSubsetShouldThrowExceptionForNullFilter()
-    {
-        var source = new ObservableCollection<int>(Enumerable.Range(1, 10));
-
-        var list = new FilteredList<int>(source, x => true);
-        var act = () => list.CreateSubSet(null!);
-
-        act.Should().Throw<ArgumentNullException>().WithParameterName("filter");
-    }
-
-    [TestMethod]
-    public void FilteredListShouldThrowExceptionForNullFilter()
-    {
-        var source = new ObservableCollection<int>(Enumerable.Range(1, 10));
-
-        var act = () => new FilteredList<int>(source, null!);
-
-        act.Should().Throw<ArgumentNullException>().WithParameterName("filter");
     }
 
     [TestMethod]
@@ -458,5 +338,41 @@ public class FilteredListOneTests
 
         source.Should().HaveCount(6).And.ContainInConsecutiveOrder(2, 4, 0, 3, 1, 5);
         list.Should().HaveCount(6).And.BeEquivalentTo(new [] { 2, 4, 0, 3, 1, 5, });
+    }
+
+    [TestMethod]
+    public void NullForFilterEquivalentsToAllowAll()
+    {
+        var source = new ObservableCollection<int>(new[] { 1, 2, 3, 4, });
+
+        var list = new FilteredList<int>(source, null);
+
+        source.Should().HaveCount(4).And.ContainInConsecutiveOrder(1, 2, 3, 4);
+        list.Should().HaveCount(4).And.BeEquivalentTo(new [] { 1, 2, 3, 4, });
+    }
+
+    [TestMethod]
+    public void RemovingAllValuesEmptiesList()
+    {
+        var source = new ObservableCollection<int>(new[] { 1, 2, 3, 4, });
+        var list = new FilteredList<int>(source, null);
+
+        source.Remove(1);
+        source.Remove(2);
+        source.Remove(3);
+        source.Remove(4);
+
+        source.Should().BeEmpty();
+        list.Should().BeEmpty();
+    }
+
+    [TestMethod]
+    public void UsingFalseForPredicateShouldKeepListEmpty()
+    {
+        var source = new ObservableCollection<int>(new[] { 1, 2, 3, 4, });
+        var list = new FilteredList<int>(source, x => false);
+
+        source.Should().NotBeEmpty();
+        list.Should().BeEmpty();
     }
 }

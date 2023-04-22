@@ -272,4 +272,191 @@ public class FilteredListOneTests
 
         list.Should().HaveCount(1).And.Contain(x => x == 1);
     }
+
+    [TestMethod]
+    public void MovingFrontItemToEndRecognisesMovement()
+    {
+        var source = new ObservableCollection<int>(new []{ 1, 2, 3, });
+
+        var list = new FilteredList<int>(source, _ => true);
+
+        source.Move(0, 2);
+
+        source.Should().HaveCount(3).And.ContainInConsecutiveOrder(2, 3, 1);
+        list.Should().HaveCount(3).And.Equal(1, 2, 3);
+    }
+
+    [TestMethod]
+    public void MovingMiddleItemToEndRecognisesMovement()
+    {
+        var source = new ObservableCollection<int>(new []{ 1, 2, 3, });
+
+        var list = new FilteredList<int>(source, _ => true);
+
+        source.Move(1, 2);
+
+        source.Should().HaveCount(3).And.ContainInConsecutiveOrder(1, 3, 2);
+        list.Should().HaveCount(3).And.Equal(1, 2, 3);
+    }
+
+    [TestMethod]
+    public void MovingEndItemToEndRecognisesMovement()
+    {
+        var source = new ObservableCollection<int>(new []{ 1, 2, 3, });
+
+        var list = new FilteredList<int>(source, _ => true);
+
+        source.Move(2, 2);
+
+        source.Should().HaveCount(3).And.ContainInConsecutiveOrder(1, 2, 3);
+        list.Should().HaveCount(3).And.Equal(1, 2, 3);
+    }
+
+    [TestMethod]
+    public void MovingEndItemToFrontRecognisesMovement()
+    {
+        var source = new ObservableCollection<int>(new []{ 1, 2, 3, });
+
+        var list = new FilteredList<int>(source, _ => true);
+
+        source.Move(2, 0);
+
+        source.Should().HaveCount(3).And.ContainInConsecutiveOrder(3, 1, 2);
+        list.Should().HaveCount(3).And.BeEquivalentTo(new [] { 1, 2, 3, });
+    }
+
+    [TestMethod]
+    public void MovingEndItemToMiddleRecognisesMovement()
+    {
+        var source = new ObservableCollection<int>(new []{ 1, 2, 3, });
+
+        var list = new FilteredList<int>(source, _ => true);
+
+        source.Move(2, 1);
+
+        source.Should().HaveCount(3).And.ContainInConsecutiveOrder(1, 3, 2);
+        list.Should().HaveCount(3).And.Equal(1, 2, 3);
+    }
+
+    [TestMethod]
+    public void MovingItemInAnyInsideIndexRecognisesReplacement()
+    {
+        var source = new ObservableCollection<int>(new []{ 1, 2, 3, 4, 5, });
+
+        var list = new FilteredList<int>(source, _ => true);
+
+        source.Move(1, 3);
+
+        source.Should().HaveCount(5).And.ContainInConsecutiveOrder(1, 3, 4, 2, 5);
+        list.Should().HaveCount(5).And.BeEquivalentTo(new [] { 1, 2, 3, 4, 5, });
+    }
+
+    [TestMethod]
+    public void SwappingItemsRecognisesReplacement()
+    {
+        var source = new ObservableCollection<int>(new []{ 1, 2, 3, 4, 5, });
+
+        var list = new FilteredList<int>(source, _ => true);
+
+        source.Move(1, 2);
+
+        source.Should().HaveCount(5).And.ContainInConsecutiveOrder(1, 3, 2, 4, 5);
+        list.Should().HaveCount(5).And.BeEquivalentTo(new [] { 1, 2, 3, 4, 5, });
+    }
+
+    [TestMethod]
+    public void SwappingItemsReverseRecognisesReplacement()
+    {
+        var source = new ObservableCollection<int>(new []{ 1, 2, 3, 4, 5, });
+
+        var list = new FilteredList<int>(source, _ => true);
+
+        source.Move(2, 1);
+
+        source.Should().HaveCount(5).And.ContainInConsecutiveOrder(1, 3, 2, 4, 5);
+        list.Should().HaveCount(5).And.BeEquivalentTo(new [] { 1, 2, 3, 4, 5, });
+    }
+
+    [TestMethod]
+    public void SwappingItemsReverseWiderRecognisesReplacement()
+    {
+        var source = new ObservableCollection<int>(new []{ 1, 2, 3, 4, 5, });
+
+        var list = new FilteredList<int>(source, _ => true);
+
+        source.Move(3, 1);
+
+        source.Should().HaveCount(5).And.ContainInConsecutiveOrder(1, 4, 2, 3, 5);
+        list.Should().HaveCount(5).And.BeEquivalentTo(new [] { 1, 2, 3, 4, 5, });
+    }
+
+    [TestMethod]
+    public void SwappingEndingsRecognisesReplacement()
+    {
+        var source = new ObservableCollection<int>(new []{ 1, 2, 3, 4, 5, });
+
+        var list = new FilteredList<int>(source, _ => true);
+
+        source.Move(0, 4);
+
+        source.Should().HaveCount(5).And.ContainInConsecutiveOrder(2, 3, 4, 5, 1);
+        list.Should().HaveCount(5).And.BeEquivalentTo(new [] { 1, 2, 3, 4, 5, });
+    }
+
+    [TestMethod]
+    public void InsertingAtEndingShouldAddValue()
+    {
+        var source = new ObservableCollection<int>(new []{ 1, 2, 3 });
+
+        var list = new FilteredList<int>(source, _ => true);
+
+        source.Insert(3, 4);
+
+        source.Should().HaveCount(4).And.ContainInConsecutiveOrder(1, 2, 3, 4);
+        list.Should().HaveCount(4).And.BeEquivalentTo(new [] { 1, 2, 3, 4, });
+    }
+
+    [TestMethod]
+    public void InsertingAtStartShouldAddValue()
+    {
+        var source = new ObservableCollection<int>(new []{ 1, 2, 3 });
+
+        var list = new FilteredList<int>(source, _ => true);
+
+        source.Insert(0, 4);
+
+        source.Should().HaveCount(4).And.ContainInConsecutiveOrder(4, 1, 2, 3);
+        list.Should().HaveCount(4).And.BeEquivalentTo(new [] { 1, 2, 3, 4, });
+    }
+
+    [TestMethod]
+    public void InsertingAtMiddleShouldAddValue()
+    {
+        var source = new ObservableCollection<int>(new []{ 1, 2, 3 });
+
+        var list = new FilteredList<int>(source, _ => true);
+
+        source.Insert(1, 4);
+
+        source.Should().HaveCount(4).And.ContainInConsecutiveOrder(1, 4, 2, 3);
+        list.Should().HaveCount(4).And.BeEquivalentTo(new [] { 1, 2, 3, 4, });
+    }
+
+    [TestMethod]
+    public void InsertRandomlyShouldAddValues()
+    {
+        var source = new ObservableCollection<int>();
+
+        var list = new FilteredList<int>(source, _ => true);
+
+        source.Insert(0, 0);
+        source.Insert(1, 1);
+        source.Insert(0, 2);
+        source.Insert(2, 3);
+        source.Insert(1, 4);
+        source.Insert(5, 5);
+
+        source.Should().HaveCount(6).And.ContainInConsecutiveOrder(2, 4, 0, 3, 1, 5);
+        list.Should().HaveCount(6).And.BeEquivalentTo(new [] { 2, 4, 0, 3, 1, 5, });
+    }
 }

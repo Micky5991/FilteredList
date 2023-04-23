@@ -14,9 +14,9 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
     public int Count => this.items.Count;
 
     private readonly HashSet<int> items;
-    private readonly Predicate<TSource>? filter;
+    private readonly Predicate<TItem>? filter;
 
-    public FilteredList(ObservableCollection<TSource> source, Predicate<TSource>? filter = null)
+    public FilteredList(ObservableCollection<TSource> source, Predicate<TItem>? filter = null)
     {
         Guard.IsNotNull(source);
 
@@ -146,7 +146,7 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
         }
     }
 
-    public bool CheckFilter(TSource item)
+    public bool CheckFilter(TItem item)
     {
         if (this.filter == null)
         {
@@ -159,24 +159,20 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
     public FilteredList<TNew, TSource> CreateSubSet<TNew>(Predicate<TNew>? subFilter = null)
         where TNew : TItem, TSource
     {
-        Predicate<TSource> typeFilter = x => x is TNew && this.CheckFilter(x);
+        Predicate<TNew> typeFilter = x => this.CheckFilter(x);
         if (subFilter != null)
         {
-            typeFilter = x => x is TNew newX && this.CheckFilter(x) && subFilter(newX);
+            typeFilter = x => this.CheckFilter(x) && subFilter(x);
         }
 
         return new FilteredList<TNew, TSource>(this.Source, typeFilter);
     }
 
-    public FilteredList<TItem, TSource> CreateSubSet(Predicate<TItem>? subFilter = null)
+    public FilteredList<TItem, TSource> CreateSubSet(Predicate<TItem> subFilter)
     {
-        Predicate<TSource> typeFilter = x => x is TItem && this.CheckFilter(x);
-        if (subFilter != null)
-        {
-            typeFilter = x => x is TItem newX && this.CheckFilter(x) && subFilter(newX);
-        }
+        Guard.IsNotNull(subFilter);
 
-        return new FilteredList<TItem, TSource>(this.Source, typeFilter);
+        return new FilteredList<TItem, TSource>(this.Source, x => this.CheckFilter(x) && subFilter(x));
     }
 
     public IEnumerator<TItem> GetEnumerator()

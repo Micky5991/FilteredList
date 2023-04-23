@@ -7,6 +7,25 @@ namespace Micky5991.FilteredList.Test;
 [TestClass]
 public class SubsetTest
 {
+    private ObservableCollection<int> collection;
+
+    private FilteredList<int> list;
+
+    [TestInitialize]
+    private void Init()
+    {
+        this.collection = new ObservableCollection<int>(new[] { 1, 2, 3, 4, 5, });
+        this.list = new FilteredList<int>(this.collection);
+    }
+
+    [TestMethod]
+    public void CreateSubSetWithNullShouldThrowException()
+    {
+        var act = () => this.list.CreateSubSet(null!);
+
+        act.Should().Throw<ArgumentNullException>().WithParameterName("subFilter");
+    }
+
     [TestMethod]
     public void ListShouldOnlyContainMatchinItems()
     {
@@ -110,5 +129,13 @@ public class SubsetTest
                .And.HaveCount(2)
                .And.OnlyHaveUniqueItems()
                .And.OnlyContain(x => x > 5 && x < 8);
+    }
+
+    [TestMethod]
+    public void CreateSubsetShouldReturnDifferentList()
+    {
+        var subset = this.list.CreateSubSet(x => true);
+
+        subset.Should().NotBeSameAs(this.list);
     }
 }

@@ -12,7 +12,7 @@ public class SubsetTest
     private FilteredList<int> list;
 
     [TestInitialize]
-    private void Initialize()
+    public void Initialize()
     {
         this.collection = new ObservableCollection<int>(new[] { 1, 2, 3, 4, 5, });
         this.list = new FilteredList<int>(this.collection);

@@ -12,7 +12,7 @@ public class SubsetTypesTest
     private FilteredList<IFurniture> list;
 
     [TestInitialize]
-    private void Init()
+    public void Init()
     {
         this.collection = new ObservableCollection<IFurniture>(new IFurniture[]
         {

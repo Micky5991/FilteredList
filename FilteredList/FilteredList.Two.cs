@@ -179,7 +179,10 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
     {
         foreach (var index in this.items)
         {
-            yield return (TItem)this.Source[index]!;
+            if (this.Source[index] is TItem convertedItem)
+            {
+                yield return convertedItem;
+            }
         }
     }
 

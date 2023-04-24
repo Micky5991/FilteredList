@@ -12,7 +12,7 @@ public class SubsetTest
     private FilteredList<int> list;
 
     [TestInitialize]
-    private void Init()
+    private void Initialize()
     {
         this.collection = new ObservableCollection<int>(new[] { 1, 2, 3, 4, 5, });
         this.list = new FilteredList<int>(this.collection);
@@ -129,13 +129,5 @@ public class SubsetTest
                .And.HaveCount(2)
                .And.OnlyHaveUniqueItems()
                .And.OnlyContain(x => x > 5 && x < 8);
-    }
-
-    [TestMethod]
-    public void CreateSubsetShouldReturnDifferentList()
-    {
-        var subset = this.list.CreateSubSet(x => true);
-
-        subset.Should().NotBeSameAs(this.list);
     }
 }

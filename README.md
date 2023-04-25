@@ -2,6 +2,14 @@
 
 A C# class that implements a filtered list using an ObservableCollection as the source.
 
+## Installation
+
+You can install this package using NuGet Package Manager:
+
+```powershell
+Install-Package Micky5991.FilteredList
+```
+
 ## Description
 
 This class allows you to create a filtered subset of an ObservableCollection based on a given predicate. The class is

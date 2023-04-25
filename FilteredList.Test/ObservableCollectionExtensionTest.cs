@@ -8,7 +8,7 @@ namespace Micky5991.FilteredList.Test;
 [TestClass]
 public class ObservableCollectionExtensionTest
 {
-    private ObservableCollection<IFurniture> collection;
+    private ObservableCollection<IFurniture>? collection;
 
     [TestInitialize]
     public void Init()
@@ -27,7 +27,7 @@ public class ObservableCollectionExtensionTest
     [TestMethod]
     public void ToFilteredListSimpleShouldCreateFilteredList()
     {
-        var list = this.collection.ToFilteredList();
+        var list = this.collection!.ToFilteredList();
 
         list.Should().BeOfType<FilteredList<IFurniture>>();
         list.Source.Should().BeSameAs(this.collection);
@@ -36,7 +36,7 @@ public class ObservableCollectionExtensionTest
     [TestMethod]
     public void ToFilteredListNullShouldCreateFilteredList()
     {
-        var list = this.collection.ToFilteredList(null!);
+        var list = this.collection!.ToFilteredList(null!);
 
         list.Should().BeOfType<FilteredList<IFurniture>>();
         list.Source.Should().BeSameAs(this.collection);
@@ -45,7 +45,7 @@ public class ObservableCollectionExtensionTest
     [TestMethod]
     public void ToFilteredListFilterShouldCreateFilteredList()
     {
-        var list = this.collection.ToFilteredList(_ => true);
+        var list = this.collection!.ToFilteredList(_ => true);
 
         list.Should().BeOfType<FilteredList<IFurniture>>();
         list.Source.Should().BeSameAs(this.collection);
@@ -54,7 +54,7 @@ public class ObservableCollectionExtensionTest
     [TestMethod]
     public void ToFilteredListTypeFilterShouldCreateFilteredList()
     {
-        var list = this.collection.ToFilteredList((ITable _) => true);
+        var list = this.collection!.ToFilteredList((ITable _) => true);
 
         list.Should().BeOfType<FilteredList<ITable, IFurniture>>();
         list.Source.Should().BeSameAs(this.collection);

@@ -7,9 +7,9 @@ namespace Micky5991.FilteredList.Test;
 [TestClass]
 public class SubsetTest
 {
-    private ObservableCollection<int> collection;
+    private ObservableCollection<int>? collection;
 
-    private FilteredList<int> list;
+    private FilteredList<int>? list;
 
     [TestInitialize]
     public void Initialize()
@@ -21,7 +21,7 @@ public class SubsetTest
     [TestMethod]
     public void CreateSubSetWithNullShouldThrowException()
     {
-        var act = () => this.list.CreateSubSet(null!);
+        var act = () => this.list!.CreateSubSet(null!);
 
         act.Should().Throw<ArgumentNullException>().WithParameterName("subFilter");
     }
@@ -30,9 +30,9 @@ public class SubsetTest
     public void ListShouldOnlyContainMatchinItems()
     {
         var source = new ObservableCollection<int>(Enumerable.Range(1, 10));
-        var list = new FilteredList<int>(source, x => x > 5);
+        var createdList = new FilteredList<int>(source, x => x > 5);
 
-        var subset = list.CreateSubSet(x => x < 7);
+        var subset = createdList.CreateSubSet(x => x < 7);
 
         subset.Should().OnlyContain(x => x > 5 && x < 7);
     }
@@ -48,8 +48,8 @@ public class SubsetTest
             new Table(10),
         };
 
-        var list = new FilteredList<IFurniture>(source, x => true);
-        var sublist = list.CreateSubSet((IChair _) => true);
+        var createdList = new FilteredList<IFurniture>(source, x => true);
+        var sublist = createdList.CreateSubSet((IChair _) => true);
 
         sublist.Should()
                .ContainInConsecutiveOrder(new Chair(5), new Chair(10))
@@ -69,8 +69,8 @@ public class SubsetTest
             new Table(10),
         };
 
-        var list = new FilteredList<IFurniture>(source, x => x.Height > 5);
-        var sublist = list.CreateSubSet((IChair _) => true);
+        var createdList = new FilteredList<IFurniture>(source, x => x.Height > 5);
+        var sublist = createdList.CreateSubSet((IChair _) => true);
 
         sublist.Should()
                .ContainInConsecutiveOrder(new Chair(10))
@@ -92,8 +92,8 @@ public class SubsetTest
             new Table(10),
         };
 
-        var list = new FilteredList<IFurniture>(source, x => x.Height > 5);
-        var sublist = list.CreateSubSet((IChair x) => x.Height < 10);
+        var createdList = new FilteredList<IFurniture>(source, x => x.Height > 5);
+        var sublist = createdList.CreateSubSet((IChair x) => x.Height < 10);
 
         sublist.Should()
                .ContainInConsecutiveOrder(new Chair(7))
@@ -107,8 +107,8 @@ public class SubsetTest
     {
         var source = new ObservableCollection<int>(Enumerable.Range(1, 10));
 
-        var list = new FilteredList<int>(source, x => x > 5);
-        var sublist = list.CreateSubSet(_ => true);
+        var createdList = new FilteredList<int>(source, x => x > 5);
+        var sublist = createdList.CreateSubSet(_ => true);
 
         sublist.Should()
                .ContainInConsecutiveOrder(6, 7, 8, 9, 10)
@@ -121,8 +121,8 @@ public class SubsetTest
     {
         var source = new ObservableCollection<int>(Enumerable.Range(1, 10));
 
-        var list = new FilteredList<int>(source, x => x > 5);
-        var sublist = list.CreateSubSet(x => x < 8);
+        var createdList = new FilteredList<int>(source, x => x > 5);
+        var sublist = createdList.CreateSubSet(x => x < 8);
 
         sublist.Should()
                .ContainInConsecutiveOrder(6, 7)

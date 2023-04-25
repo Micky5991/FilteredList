@@ -7,9 +7,9 @@ namespace Micky5991.FilteredList.Test;
 [TestClass]
 public class SubsetTypesTest
 {
-    private ObservableCollection<IFurniture> collection;
+    private ObservableCollection<IFurniture>? collection;
 
-    private FilteredList<IFurniture> list;
+    private FilteredList<IFurniture>? list;
 
     [TestInitialize]
     public void Init()
@@ -29,7 +29,7 @@ public class SubsetTypesTest
     [TestMethod]
     public void CreateSubsetShouldReturnDifferentList()
     {
-        var subset = this.list.CreateSubSet<IFurniture>();
+        var subset = this.list!.CreateSubSet<IFurniture>();
 
         subset.Should().NotBeSameAs(this.list);
     }
@@ -37,7 +37,7 @@ public class SubsetTypesTest
     [TestMethod]
     public void CreateSubsetShouldCreateListWithCorrectType()
     {
-        var subset = this.list.CreateSubSet<IStorable>();
+        var subset = this.list!.CreateSubSet<IStorable>();
 
         subset.Should().HaveCount(4);
     }

@@ -1,15 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using CommunityToolkit.Diagnostics;
 
 namespace Micky5991.FilteredList;
 
-public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyCollectionChanged, INotifyPropertyChanged
+public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>
     where TItem : TSource
 {
-
     public ObservableCollection<TSource> Source { get; }
     public int Count => this.items.Count;
 
@@ -29,10 +27,6 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>, INotifyC
 
         this.Source.CollectionChanged += this.OnSourceChanged;
     }
-
-    public event NotifyCollectionChangedEventHandler? CollectionChanged;
-
-    public event PropertyChangedEventHandler? PropertyChanged;
 
     private void OnSourceChanged(object sender, NotifyCollectionChangedEventArgs e)
     {

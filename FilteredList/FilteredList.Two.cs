@@ -5,7 +5,7 @@ using CommunityToolkit.Diagnostics;
 
 namespace Micky5991.FilteredList;
 
-public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>
+public class FilteredList<TItem, TSource> : IFilteredList<TItem, TSource>
     where TItem : TSource
 {
     public ObservableCollection<TSource> Source { get; }

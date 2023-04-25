@@ -140,7 +140,7 @@ public class FilteredList<TItem, TSource> : IReadOnlyCollection<TItem>
         }
     }
 
-    public bool CheckFilter(TItem item)
+    private bool CheckFilter(TItem item)
     {
         if (this.filter == null)
         {

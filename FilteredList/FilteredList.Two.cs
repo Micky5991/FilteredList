@@ -5,10 +5,16 @@ using CommunityToolkit.Diagnostics;
 
 namespace Micky5991.FilteredList;
 
+/// <inheritdoc cref="IFilteredList{TItem, TSource}"/>
 public class FilteredList<TItem, TSource> : IFilteredList<TItem, TSource>
     where TItem : TSource
 {
+    /// <summary>
+    /// Gets the source list of this <see cref="IFilteredList{TItem,TSource}"/>.
+    /// </summary>
     public ObservableCollection<TSource> Source { get; }
+
+    /// <inheritdoc />
     public int Count => this.items.Count;
 
     private readonly HashSet<int> items;
@@ -150,6 +156,7 @@ public class FilteredList<TItem, TSource> : IFilteredList<TItem, TSource>
         return this.filter(item);
     }
 
+    /// <inheritdoc />
     public FilteredList<TNew, TSource> CreateSubSet<TNew>(Predicate<TNew>? subFilter = null)
         where TNew : TItem, TSource
     {
@@ -162,6 +169,7 @@ public class FilteredList<TItem, TSource> : IFilteredList<TItem, TSource>
         return new FilteredList<TNew, TSource>(this.Source, typeFilter);
     }
 
+    /// <inheritdoc />
     public FilteredList<TItem, TSource> CreateSubSet(Predicate<TItem> subFilter)
     {
         Guard.IsNotNull(subFilter);
@@ -169,6 +177,7 @@ public class FilteredList<TItem, TSource> : IFilteredList<TItem, TSource>
         return new FilteredList<TItem, TSource>(this.Source, x => this.CheckFilter(x) && subFilter(x));
     }
 
+    /// <inheritdoc />
     public IEnumerator<TItem> GetEnumerator()
     {
         foreach (var index in this.items)
@@ -180,6 +189,7 @@ public class FilteredList<TItem, TSource> : IFilteredList<TItem, TSource>
         }
     }
 
+    /// <inheritdoc />
     IEnumerator IEnumerable.GetEnumerator()
     {
         return this.GetEnumerator();

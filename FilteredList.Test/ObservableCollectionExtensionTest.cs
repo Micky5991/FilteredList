@@ -29,7 +29,7 @@ public class ObservableCollectionExtensionTest
     {
         var list = this.collection.ToFilteredList();
 
-        list.Should().BeOfType<FilteredList<ITable>>();
+        list.Should().BeOfType<FilteredList<IFurniture>>();
         list.Source.Should().BeSameAs(this.collection);
     }
 
@@ -38,7 +38,7 @@ public class ObservableCollectionExtensionTest
     {
         var list = this.collection.ToFilteredList(null!);
 
-        list.Should().BeOfType<FilteredList<ITable>>();
+        list.Should().BeOfType<FilteredList<IFurniture>>();
         list.Source.Should().BeSameAs(this.collection);
     }
 
@@ -47,7 +47,7 @@ public class ObservableCollectionExtensionTest
     {
         var list = this.collection.ToFilteredList(_ => true);
 
-        list.Should().BeOfType<FilteredList<ITable>>();
+        list.Should().BeOfType<FilteredList<IFurniture>>();
         list.Source.Should().BeSameAs(this.collection);
     }
 

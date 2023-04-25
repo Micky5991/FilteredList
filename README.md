@@ -22,6 +22,11 @@ public interface IPlayer : IEntity
 {
     int Score { get; }
 }
+
+public interface IAnimal : IEntity
+{
+    int Age { get; }
+}
 ```
 
 We can create a source list of IEntity objects and add some IPlayer and IAnimal objects to it:

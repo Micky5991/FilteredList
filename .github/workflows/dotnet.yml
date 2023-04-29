@@ -45,7 +45,7 @@ jobs:
 
       - name: Build
         if: needs.variables.outputs.istag == 'false'
-        run: dotnet build --configuration Release --no-restore -p:TreatWarningsAsErrors=true
+        run: dotnet build --configuration Release -p:TreatWarningsAsErrors=true
 
       - name: Build with version ${{ needs.variables.outputs.ref }}
         if: needs.variables.outputs.istag == 'true'

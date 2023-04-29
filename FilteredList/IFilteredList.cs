@@ -28,6 +28,7 @@ public interface IFilteredList<TItem, TSource> : IReadOnlyCollection<TItem>
     FilteredList<TItem, TSource> CreateSubSet(Predicate<TItem> subFilter);
 }
 
+/// <inheritdoc />
 public interface IFilteredList<T> : IFilteredList<T, T>
 {
     // empty

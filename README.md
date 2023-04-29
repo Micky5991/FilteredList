@@ -47,13 +47,13 @@ sourceList.Add(new Animal { Name = "Charlie", Age = 3 });
 sourceList.Add(new Animal { Name = "David", Age = 5 });
 ```
 
-Now, we can create a `FilteredList` of `IPlayer` objects names longer than 3 characters:
+Now, we can create a `FilteredList` of `IEntity` objects names longer than 3 characters:
 
 ```csharp
 var filteredList = new FilteredList<IEntity>(sourceList, x => x.Name.Length > 10);
 ```
 
-To further reduce the list of entities down, you can create another subset of this list to only include player with a score
+To further reduce the list of entities down, you can create another subset of this list to only include players with a score
 of more than 10:
 
 ```csharp

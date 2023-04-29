@@ -43,13 +43,19 @@ jobs:
             7.0.x
             8.0.x
 
-      - name: Build project
+      - name: Build
+        if: needs.variables.outputs.istag == 'false'
+        run: dotnet build --configuration Release --no-restore -p:TreatWarningsAsErrors=true
+
+      - name: Build with version ${{ needs.variables.outputs.ref }}
+        if: needs.variables.outputs.istag == 'true'
         run: dotnet build --configuration Release -p:TreatWarningsAsErrors=true -p:Version=${{ needs.variables.outputs.ref }} -p:PackageVersion=${{ needs.variables.outputs.ref }}
 
       - name: Run tests
         run: dotnet test --no-restore --verbosity normal
 
       - uses: actions/upload-artifact@v3
+        if: needs.variables.outputs.istag == 'true'
         with:
           name: nuget-package
           path: FilteredList/bin/Release/*.nupkg
